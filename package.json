@@ -4,9 +4,10 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "dev:client": "vite dev",
     "dev": "tsx --env-file=.env.development src/server/main.ts",
-    "build": "tsc -b && vite build",
-    "server": "vite build && tsx --env-file=.env.production src/server/main.ts",
+    "build": "tsc -b && vite build && vite build --ssr src/server/entry-server.tsx",
+    "server": "npm run build && tsx --env-file=.env.production src/server/main.ts",
     "lint": "eslint .",
     "preview": "vite preview"
   },
