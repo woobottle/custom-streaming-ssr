@@ -4,16 +4,23 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "tsx --env-file=.env.development src/server/main.ts",
     "build": "tsc -b && vite build",
+    "server": "vite build && tsx --env-file=.env.production src/server/main.ts",
     "lint": "eslint .",
     "preview": "vite preview"
   },
   "dependencies": {
+    "@fastify/middie": "^9.3.1",
+    "fastify": "^5.8.1",
     "react": "^19.2.0",
-    "react-dom": "^19.2.0"
+    "react-dom": "^19.2.0",
+    "react-router-dom": "^7.13.1",
+    "sirv": "^3.0.2",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
+    "@biomejs/biome": "^2.4.6",
     "@eslint/js": "^9.39.1",
     "@types/node": "^24.10.1",
     "@types/react": "^19.2.7",
