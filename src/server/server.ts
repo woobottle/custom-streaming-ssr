@@ -40,10 +40,12 @@ async function createServer() {
         )
 
         const html = await vite.transformIndexHtml(url, template)
+        const { render } = await vite.ssrLoadModule('/src/server/entry-server.tsx')
+        const appHtml = render(url)
 
         res.statusCode = 200
         res.setHeader('Content-Type', 'text/html')
-        res.end(html)
+        res.end(html.replace('<!-- outlet -->', appHtml))
       } catch (e: any) {
         vite.ssrFixStacktrace(e)
         next(e)
@@ -54,17 +56,20 @@ async function createServer() {
           path.resolve('dist/client/index.html'),
           'utf-8',
         )
+        // @ts-expect-error -- 빌드된 서버 번들
+        const { render } = await import('../../dist/server/entry-server.js')
+        const appHtml = render(url)
 
         res.statusCode = 200
         res.setHeader('Content-Type', 'text/html')
-        res.end(template)
+        res.end(template.replace('<!-- outlet -->', appHtml))
       } catch (e: any) {
         next(e)
       }
     }
   })
 
-  fastify.listen({ port: 5173 })
+  fastify.listen({ port: 3000 })
 }
 
 export {

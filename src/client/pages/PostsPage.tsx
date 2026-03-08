@@ -14,13 +14,14 @@ const PostsPage = () => {
   
   useEffect(() => {
     fetch('https://jsonplaceholder.typicode.com/posts')
-      .then((res) => res.json())
+      .then((res) => res.json()) 
       .then((data) => z.array(Post).safeParse(data))
       .then((res) => { if (res.success) setPosts(res.data) })
   }, [])
 
   return (
     <div> 
+      <div>test for initial render</div>
       <ul>
         {posts.map((post) => (
           <li key={post.id}>
@@ -28,7 +29,7 @@ const PostsPage = () => {
           </li>
         ))}
       </ul>
-    </div>
+    </div> 
   )
   
 }
