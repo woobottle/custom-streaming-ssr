@@ -24,13 +24,13 @@ async function createServer() {
   } else {
     // https://github.com/bluwy/create-vite-extra/blob/master/template-ssr-react/server.js
     fastify.use(sirv(path.resolve('dist/client'), {
-      extensions: ['html']
+      extensions: ['']
     }))
   }
 
 
-  fastify.use('*all', async (req, res, next) => {
-    const url = req.originalUrl
+  fastify.get('*', async (request, reply) => {
+    const url = request.originalUrl
 
     if (isDev) {
       try {
@@ -39,16 +39,16 @@ async function createServer() {
           'utf-8',
         )
 
-        const html = await vite.transformIndexHtml(url, template)
         const { render } = await vite.ssrLoadModule('/src/server/entry-server.tsx')
-        const appHtml = render(url)
+        const html = await vite.transformIndexHtml(url, template)
+        const stream = render(url, html)
 
-        res.statusCode = 200
-        res.setHeader('Content-Type', 'text/html')
-        res.end(html.replace('<!-- outlet -->', appHtml))
+        reply.header('Content-type', 'text/html')
+        return reply.send(stream)
       } catch (e: any) {
         vite.ssrFixStacktrace(e)
-        next(e)
+        console.log(e.stack)
+        reply.status(500)
       }
     } else {
       try {
@@ -58,13 +58,13 @@ async function createServer() {
         )
         // @ts-expect-error -- 빌드된 서버 번들
         const { render } = await import('../../dist/server/entry-server.js')
-        const appHtml = render(url)
+        const stream = render(url, template)
 
-        res.statusCode = 200
-        res.setHeader('Content-Type', 'text/html')
-        res.end(template.replace('<!-- outlet -->', appHtml))
+        reply.header('Content-type', 'text/html')
+        return reply.send(stream)
       } catch (e: any) {
-        next(e)
+        console.log(e.stack)
+        reply.status(500)
       }
     }
   })
